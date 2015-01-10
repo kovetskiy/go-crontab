@@ -5,7 +5,7 @@ It's yet cron package written in Go.
 # Why not other?
 
 I was looking for pretty good `*go*cron*` package, but all of these packages
-do not work with cron format "*/10" and does not allows to use groups of jobs.
+does not work with cron format "*/10" and does not allows to use groups of jobs.
 
 ### All `*go*cron*` packages sucks, this package sucks less.
 
