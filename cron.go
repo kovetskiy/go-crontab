@@ -1,6 +1,8 @@
 package cron
 
 import (
+	"errors"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -12,18 +14,42 @@ type (
 		Dom  string
 		Mon  string
 		Dow  string
-		Run  func()
+		Task func()
 	}
 
 	Jobs []Job
 )
+
+var (
+	reSchedule = regexp.MustCompile(`(\*\/[0-9]{1,2})|(\*)|([0-9]{1,2})`)
+)
+
+func NewJob(schedule string, task func()) (*Job, error) {
+	//six because should trigger error when params count not equals 5
+	matches := reSchedule.FindAllString(schedule, 6)
+	if len(matches) != 5 {
+		return nil, errors.New(
+			`Schedule should be specified as %min %hour %dom %mon %dow`)
+	}
+
+	job := &Job{
+		Min: matches[0],
+		Hour: matches[1],
+		Dom: matches[2],
+		Mon: matches[3],
+		Dow: matches[4],
+		Task: task,
+	}
+
+	return job, nil
+}
 
 func (jobs *Jobs) Process() {
 	for {
 		now := time.Now()
 		for _, job := range *jobs {
 			if job.IsMatchTime(now) {
-				go job.Run()
+				go job.Task()
 			}
 		}
 

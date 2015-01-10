@@ -13,20 +13,18 @@ do not work with cron format "*/10" and does not allows to use groups of jobs.
 go-crontab allows to use group of jobs, just create instance `Jobs`.
 
 ```
-jobs := new(cron.Jobs)
+jobs := cron.Jobs{}
 ```
 
 Actually, `Jobs` it's just `[]Job`, so you can append other jobs with `append`.
 
 ```
-job := cron.Job{
-    Hour: "*/2",
-    Run: func() {
+job := cron.NewJob("* */2 * * *", func() {
         //stuff
     },
-}
+)
 
-jobs := append(jobs, job)
+jobs = append(jobs, *job)
 ```
 
 To run the schedule you should write:

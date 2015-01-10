@@ -111,7 +111,7 @@ var TestJobsProcessTick = 0
 func TestJobsProcess(t *testing.T) {
 	jobs := &Jobs{
 		Job{
-			Run: func() {
+			Task: func() {
 				TestJobsProcessTick++
 			},
 		},
@@ -123,5 +123,51 @@ func TestJobsProcess(t *testing.T) {
 
 	if TestJobsProcessTick != 1 {
 		t.Fatalf("Something went wrong, got %d ticks", TestJobsProcessTick)
+	}
+}
+
+func TestNewJob(t *testing.T) {
+	tests := []struct {
+		Schedule    string
+		ErrExpected bool
+	}{
+		{
+			"1 2 3 4 5",
+			false,
+		},
+		{
+			"1 2 3 4 5 6 7",
+			true,
+		},
+		{
+			"1 2 3 4 5 6",
+			true,
+		},
+		{
+			"1 2 3 4",
+			true,
+		},
+		{
+			"10/20 2 3 4 5",
+			true,
+		},
+		{
+			"* * 3 * *",
+			false,
+		},
+		{
+			"*/10 * 3 */2 *",
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		_, err := NewJob(test.Schedule, func() {})
+		if err == nil && test.ErrExpected {
+			t.Errorf("For %v error must not be nil", test.Schedule)
+		}
+		if err != nil && !test.ErrExpected {
+			t.Errorf("For %v error must be nil", test.Schedule)
+		}
 	}
 }
